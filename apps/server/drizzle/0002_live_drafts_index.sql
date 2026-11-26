@@ -1,0 +1,1 @@
+CREATE INDEX "idx_pages_live_drafts" ON "pages" USING btree ("space_id","path") WHERE "pages"."status" = 'draft' and "pages"."deleted_at" is null;

@@ -1,0 +1,129 @@
+{
+  "realm": "handbook",
+  "displayName": "Handbook (development)",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "groups": [
+    {
+      "name": "staff",
+      "path": "/staff",
+      "subGroups": [
+        {
+          "name": "it",
+          "path": "/staff/it"
+        }
+      ]
+    },
+    {
+      "name": "guests",
+      "path": "/guests"
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "handbook",
+      "name": "Handbook (development)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "handbook-dev-client-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "redirectUris": [
+        "http://localhost:3000/api/auth/callback/oidc",
+        "http://localhost:5173/api/auth/callback/oidc"
+      ],
+      "webOrigins": ["http://localhost:3000", "http://localhost:5173"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "claim.name": "groups"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "ada",
+      "enabled": true,
+      "email": "ada@example.org",
+      "emailVerified": true,
+      "firstName": "Ada",
+      "lastName": "Lovelace",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "handbook-dev",
+          "temporary": false
+        }
+      ],
+      "groups": ["/staff/it"]
+    },
+    {
+      "username": "eddie",
+      "enabled": true,
+      "email": "eddie@example.org",
+      "emailVerified": true,
+      "firstName": "Eddie",
+      "lastName": "Editor",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "handbook-dev",
+          "temporary": false
+        }
+      ],
+      "groups": ["/staff/it"]
+    },
+    {
+      "username": "rita",
+      "enabled": true,
+      "email": "rita@example.org",
+      "emailVerified": true,
+      "firstName": "Rita",
+      "lastName": "Reader",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "handbook-dev",
+          "temporary": false
+        }
+      ],
+      "groups": ["/staff"]
+    },
+    {
+      "username": "gina",
+      "enabled": true,
+      "email": "gina@example.org",
+      "emailVerified": true,
+      "firstName": "Gina",
+      "lastName": "Guest",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "handbook-dev",
+          "temporary": false
+        }
+      ],
+      "groups": ["/guests"]
+    }
+  ]
+}

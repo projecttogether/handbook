@@ -1,0 +1,95 @@
+# Production on a Linux server (Debian, Ubuntu) with Docker Compose: the
+# image as two processes, the web app (`web`) and the worker (`worker`: search
+# index upkeep and cleanup), after a one-off migration. Settings live in .env
+# next to this file (docs/configuration.md). Start it with:
+#
+#   docker compose up -d --pull always
+#
+# HANDBOOK_IMAGE_TAG in .env selects the image of ghcr.io/projecttogether/handbook:
+# latest (the newest commit on main, the default) or sha-<commit> for one
+# build. To upgrade, run the same command again: it pulls the newer image.
+#
+# Without a PostgreSQL of your own, add compose.postgres.yaml
+# (COMPOSE_FILE=compose.yaml:compose.postgres.yaml in .env).
+#
+# `web` listens on 127.0.0.1:3000 (HANDBOOK_PORT changes the host port), for a
+# reverse proxy on the same server, such as Caddy, that terminates HTTPS; set
+# APP_URL to its public https URL. Uploaded files live in the `files` volume:
+# back it up with the database.
+
+x-image: &image ghcr.io/projecttogether/handbook:${HANDBOOK_IMAGE_TAG:-latest}
+
+# Every variable in .env reaches the containers (docs/configuration.md); the
+# required ones are checked here so a missing value stops the start.
+x-app-environment: &app-environment
+  DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
+  APP_URL: ${APP_URL:?Set APP_URL}
+  AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET}
+  OIDC_ISSUER: ${OIDC_ISSUER:?Set OIDC_ISSUER}
+  OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:?Set OIDC_CLIENT_ID}
+  OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?Set OIDC_CLIENT_SECRET}
+  ADMIN_EMAILS: ${ADMIN_EMAILS:?Set ADMIN_EMAILS to the first admin's email address}
+  # The reverse proxy in front of the app sets X-Forwarded-For.
+  TRUST_PROXY: ${TRUST_PROXY:-true}
+
+x-app: &app
+  image: *image
+  env_file:
+    - path: .env
+      required: false
+  environment: *app-environment
+
+services:
+  migrate:
+    <<: *app
+    command: ["migrate"]
+    restart: "no"
+
+  web:
+    <<: *app
+    command: ["web"]
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - files:/data/files
+    ports:
+      # Only on the server itself, for the reverse proxy. HANDBOOK_PORT picks
+      # another host port when 3000 is taken, e.g. by another app.
+      - "127.0.0.1:${HANDBOOK_PORT:-3000}:3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/-/readyz').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  worker:
+    <<: *app
+    command: ["worker"]
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      # The worker removes uploads that no page uses.
+      - files:/data/files
+    healthcheck:
+      # The worker touches the file every few seconds while it runs.
+      test:
+        - CMD
+        - node
+        - -e
+        - "const s = require('node:fs').statSync('/tmp/worker-heartbeat', { throwIfNoEntry: false }); process.exit(s && Date.now() - s.mtimeMs < 60000 ? 0 : 1)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  files:

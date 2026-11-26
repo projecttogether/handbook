@@ -1,0 +1,43 @@
+# Local development: PostgreSQL 18 and a Keycloak with a development realm.
+#   docker compose -f compose.dev.yaml up -d
+# Keycloak: http://localhost:8104 (admin / admin), realm "handbook", test
+# users with the password "handbook-dev":
+#   ada@example.org    admin (ADMIN_EMAILS in .env.example), group /staff/it
+#   eddie@example.org  group /staff/it; make him an editor of a space in the app
+#   rita@example.org   group /staff; reads
+#   gina@example.org   group /guests; refused while ACCESS_GROUPS=/staff
+# The production setup is compose.yaml.
+name: handbook-dev
+
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: handbook
+      POSTGRES_PASSWORD: handbook
+      POSTGRES_DB: handbook
+    ports:
+      - "127.0.0.1:55450:5432"
+    volumes:
+      - postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U handbook -d handbook"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2-3
+    command: ["start-dev", "--import-realm", "--http-port=8080"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # The image sizes the heap from host RAM (up to 70 %); cap it for local use.
+      JAVA_OPTS_KC_HEAP: "-Xms64m -Xmx512m"
+    ports:
+      - "127.0.0.1:8104:8080"
+    volumes:
+      - ./dev/keycloak:/opt/keycloak/data/import:ro
+
+volumes:
+  postgres:
