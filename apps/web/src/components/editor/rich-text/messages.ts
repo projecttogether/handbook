@@ -1,0 +1,68 @@
+import { defineMessages } from "@/i18n";
+
+export const richTextMessages = defineMessages({
+  en: {
+    // Blocks of the / menu
+    text: "Text",
+    heading2: "Heading",
+    heading3: "Subheading",
+    bulletList: "Bulleted list",
+    orderedList: "Numbered list",
+    taskList: "Task list",
+    quote: "Quote",
+    callout: "Callout",
+    table: "Table",
+    codeBlock: "Code block",
+    divider: "Divider",
+    upload: "Image or file",
+    pageLink: "Link to a page",
+    insert: "Insert",
+    noMatches: "Nothing matches “{query}”.",
+    addBlock: "Insert a block",
+    placeholder: "Start writing, or type / to insert a block",
+    headingPlaceholder: "Heading",
+    // Formatting
+    formatting: "Formatting",
+    bold: "Bold",
+    italic: "Italic",
+    strike: "Strikethrough",
+    code: "Inline code",
+    link: "Link",
+    h2: "Heading",
+    h3: "Subheading",
+    // Links
+    linkPlaceholder: "Paste a link or search pages",
+    removeLink: "Remove link",
+    applyLink: "Apply",
+    pageLinkTitle: "Link to a page",
+    findPage: "Find a page…",
+    noPages: "No pages found.",
+    typeToSearch: "Type to search.",
+    // Tables
+    tableActions: "Table",
+    rowAbove: "Add a row above",
+    rowBelow: "Add a row below",
+    columnLeft: "Add a column on the left",
+    columnRight: "Add a column on the right",
+    deleteRow: "Delete the row",
+    deleteColumn: "Delete the column",
+    deleteTable: "Delete the table",
+    row: "Row",
+    column: "Column",
+    wholeTable: "Table",
+    // Callouts
+    calloutType: "Callout type",
+    note: "Note",
+    tip: "Tip",
+    important: "Important",
+    warning: "Warning",
+    caution: "Caution",
+    // Markdown kept as written
+    rawTitle: "Markdown",
+    rawHelp: "Rich text cannot show this part. Edit it here; it is saved exactly as written.",
+    rawLabel: "Markdown of this part",
+    // Uploads
+    uploading: "Uploading {name}…",
+    uploaded: "Added {name}",
+  },
+});

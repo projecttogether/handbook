@@ -1,0 +1,30 @@
+import { defineMessages } from "@/i18n";
+
+export const messages = defineMessages({
+  en: {
+    title: "Search",
+    query: "Search for",
+    placeholder: "Words, phrases, names…",
+    submit: "Search",
+    space: "Space",
+    allSpaces: "All spaces",
+    tag: "Tag",
+    anyTag: "Any tag",
+    results: "{count} pages found",
+    results_one: "1 page found",
+    noResults: "No pages found",
+    noResultsHint: "Try other words, or fewer of them.",
+    start: "Search every space",
+    startHint: "Titles, text, tags and other search terms all count.",
+    clearFilter: "Remove filter {name}",
+    tagsTitle: "Tags",
+    tagsDescription: "Tags group pages across spaces.",
+    noTags: "No tags yet",
+    noTagsHint: "Pages get tags in their properties.",
+    pages: "{count} pages",
+    pages_one: "1 page",
+    tagTitle: "Pages tagged “{tag}”",
+    noTagged: "No pages have this tag.",
+    allTags: "All tags",
+  },
+});
